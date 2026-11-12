@@ -470,3 +470,55 @@ html.is-arriving .curtain { visibility: visible; }
   .ml-sec a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 7.5pt; color: #444; word-break: break-all; }
   .ml-table a[href^="http"]::after { content: none; }
 }
+
+/* ---------- page de travail : variantes de la barre ---------- */
+.var-page { padding: clamp(40px, 6vw, 90px) var(--margin) 120px; }
+.var-lead { max-width: 38em; margin: 24px 0 56px; font-size: clamp(17px, 1.3vw, 20px); }
+.var-card { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: var(--gutter); row-gap: 18px; padding: 36px 0 56px; border-top: 1px solid var(--graphite); }
+.var-text { grid-column: 1 / span 4; }
+.var-title { font-stretch: 75%; font-weight: 700; font-size: clamp(1.6rem, 2.4vw, 2.2rem); line-height: 1; letter-spacing: -0.015em; margin-bottom: 14px; }
+.cordeau-var { grid-column: 5 / span 8; aspect-ratio: 16 / 10; }
+@media (max-width: 900px) { .var-text, .cordeau-var { grid-column: 1 / -1; } .cordeau-var { aspect-ratio: 4 / 3; } }
+
+.cordeau-ticks, .cordeau-ticks2 { display: none; }
+.cordeau[data-variant] .cordeau-handle { font-family: var(--mono); }
+
+/* B. ruban de masquage */
+[data-variant="ruban"] .cordeau-dust { stroke: rgba(0,0,0,.28); stroke-width: 34; opacity: 1; filter: blur(6px); }
+[data-variant="ruban"] .cordeau-halo { stroke: #CDBB7C; stroke-width: 30; stroke-linecap: butt; }
+[data-variant="ruban"] .cordeau-path { stroke: #E9DAA2; stroke-width: 27; stroke-linecap: butt; }
+.cordeau[data-variant="ruban"]:has(.cordeau-range) .cordeau-handle { width: auto; height: auto; margin: 0; border: 0; border-radius: 0; background: none; translate: -50% -50%; }
+.cordeau[data-variant="ruban"]:has(.cordeau-range) .cordeau-handle::before { content: 'chantier ◂ ▸ livré'; writing-mode: vertical-rl; transform: rotate(180deg); font-family: 'Comic Sans MS', 'Marker Felt', var(--mono); font-size: 14px; font-weight: 600; color: #1F2B6E; letter-spacing: .02em; }
+[data-variant="ruban"].cordeau:has(.cordeau-range:focus-visible) .cordeau-handle { outline: 3px solid var(--cordeau); background: transparent; }
+
+/* C. mètre ruban */
+[data-variant="metre"] .cordeau-dust { stroke: rgba(0,0,0,.35); stroke-width: 30; opacity: 1; filter: blur(5px); }
+[data-variant="metre"] .cordeau-halo { stroke: #C99A0E; stroke-width: 26; stroke-linecap: butt; }
+[data-variant="metre"] .cordeau-path { stroke: #F4C430; stroke-width: 24; stroke-linecap: butt; }
+[data-variant="metre"] .cordeau-ticks { display: block; stroke: #1A1A1A; stroke-width: 7; stroke-dasharray: 1.2 8.8; stroke-linecap: butt; transform: translateX(-8px); }
+[data-variant="metre"] .cordeau-ticks2 { display: block; stroke: #1A1A1A; stroke-width: 12; stroke-dasharray: 1.6 48.4; stroke-linecap: butt; transform: translateX(-6px); }
+[data-variant="metre"] { --hy: .5; }
+.cordeau[data-variant="metre"]:has(.cordeau-range) .cordeau-handle { width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 10px; background: #2B2C2E; border: 3px solid #F4C430; }
+.cordeau[data-variant="metre"]:has(.cordeau-range) .cordeau-handle::before { content: '◂ ▸'; color: #F4C430; font-size: 18px; }
+
+/* D. niveau laser */
+[data-variant="laser"] { --hy: .9; }
+[data-variant="laser"] .cordeau-dust { stroke: #FF2A2A; stroke-width: 14; opacity: .35; filter: blur(6px); }
+[data-variant="laser"] .cordeau-halo { stroke: rgba(255,80,80,.55); stroke-width: 4; }
+[data-variant="laser"] .cordeau-path { stroke: #FF3B3B; stroke-width: 1.6; stroke-dasharray: 10 4; }
+.cordeau[data-variant="laser"]:has(.cordeau-range) .cordeau-handle { width: 58px; height: 38px; margin: -19px 0 0 -29px; border-radius: 6px; background: #1C1D1F; border: 2px solid #3A3B3E; }
+.cordeau[data-variant="laser"]:has(.cordeau-range) .cordeau-handle::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: #FF3B3B; box-shadow: 0 0 10px 3px rgba(255,59,59,.8); }
+
+/* E. crayon + cote */
+[data-variant="crayon"] .cordeau-dust { display: none; }
+[data-variant="crayon"] .cordeau-halo { stroke: rgba(255,255,255,.5); stroke-width: 5; }
+[data-variant="crayon"] .cordeau-path { stroke: #2A2B2D; stroke-width: 3; stroke-dasharray: 30 3 14 2; }
+.cordeau[data-variant="crayon"]:has(.cordeau-range) .cordeau-handle { width: auto; height: auto; margin: 0; translate: -50% -50%; border-radius: 0; border: 1.5px solid var(--graphite); background: var(--enduit); padding: 8px 12px; }
+.cordeau[data-variant="crayon"]:has(.cordeau-range) .cordeau-handle::before { content: '◂  Chantier  |  Livré  ▸'; white-space: pre; color: var(--graphite); font-family: var(--mono); font-size: 13px; font-weight: 500; }
+
+/* F. joint ouvert */
+[data-variant="joint"] .cordeau-dust { stroke: rgba(0,0,0,.35); stroke-width: 16; opacity: 1; filter: blur(5px); }
+[data-variant="joint"] .cordeau-halo { display: none; }
+[data-variant="joint"] .cordeau-path { stroke: var(--enduit); stroke-width: 10; stroke-linecap: butt; }
+.cordeau[data-variant="joint"]:has(.cordeau-range) .cordeau-handle { border-radius: 0; background: var(--enduit); border: 0; width: 44px; height: 44px; margin: -22px 0 0 -22px; }
+.cordeau[data-variant="joint"]:has(.cordeau-range) .cordeau-handle::before { content: '‹ ›'; white-space: pre; color: var(--graphite); font-size: 24px; font-weight: 400; letter-spacing: 4px; }

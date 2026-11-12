@@ -179,14 +179,15 @@ def footer():
   <p class="footer-note">Maquette de démonstration. Garantie décennale, assureur et numéros d’immatriculation à compléter avec les informations réelles.</p>
 </footer>'''
 
-def cordeau_stage(before, after, *, labels=('Chantier', 'Livré'), cls='', eager=False, interactive=True, start=0.5, pos=('50% 50%', '50% 50%'), sizes='100vw', range_label='Position de la ligne entre chantier et pièce livrée'):
+def cordeau_stage(before, after, *, labels=('Chantier', 'Livré'), cls='', eager=False, interactive=True, start=0.5, pos=('50% 50%', '50% 50%'), sizes='100vw', range_label='Position de la ligne entre chantier et pièce livrée', variant='', rigid=False):
     rng = ''
     if interactive:
         rng = f'<input class="cordeau-range" type="range" min="0" max="100" value="{int(start*100)}" aria-label="{range_label}" data-cordeau-range>'
-    return f'''<div class="cordeau {cls}" data-cordeau data-start="{start}">
+    va = (f' data-variant="{variant}"' if variant else '') + (' data-rigid' if rigid else '')
+    return f'''<div class="cordeau {cls}" data-cordeau data-start="{start}"{va}>
   <figure class="cordeau-layer cordeau-before">{img(before[0], before[1], sizes=sizes, eager=eager, pos=pos[0])}<span class="tape tape-before" aria-hidden="true">{labels[0]}</span></figure>
   <figure class="cordeau-layer cordeau-after" data-cordeau-after>{img(after[0], after[1], sizes=sizes, eager=eager, pos=pos[1])}<span class="tape tape-after" aria-hidden="true">{labels[1]}</span></figure>
-  <svg class="cordeau-svg" aria-hidden="true" data-cordeau-svg><path class="cordeau-dust" d="" /><path class="cordeau-halo" d="" /><path class="cordeau-path" d="" /></svg>
+  <svg class="cordeau-svg" aria-hidden="true" data-cordeau-svg><path class="cordeau-dust" d="" /><path class="cordeau-halo" d="" /><path class="cordeau-path" d="" /><path class="cordeau-ticks" d="" /><path class="cordeau-ticks2" d="" /></svg>
   <span class="cordeau-handle" aria-hidden="true" data-cordeau-handle></span>
   {rng}
 </div>'''
@@ -636,6 +637,35 @@ def notfound():
 '''
     return page(path='404.html', title='Page introuvable · Atelier Cordeau', description='Cette page n’existe pas.', body=body, body_class='page-404')
 
+
+VARIANTES = [
+    ('cordeau', 'A. Le cordeau (actuel)', 'Ligne bleue de poudre de craie, poignée ronde. Elle vibre quand on la lâche, comme un cordeau qu’on claque sur un mur.', False),
+    ('ruban', 'B. Le ruban de masquage', 'Une bande de ruban beige posée verticalement, comme celle qu’on colle avant de peindre. Les mots « chantier » et « livré » sont écrits dessus au feutre.', True),
+    ('metre', 'C. Le mètre ruban', 'Un mètre jaune gradué tous les centimètres, avec son boîtier comme poignée. Évoque la prise de mesures du relevé.', True),
+    ('laser', 'D. Le niveau laser', 'Un trait rouge fin et lumineux, avec le petit boîtier du laser posé en bas de l’image. Très précis, très technique.', True),
+    ('crayon', 'E. Le trait de crayon et la cote', 'Un trait de crayon de charpentier, et au centre une étiquette de cote « Chantier | Livré » comme sur un plan.', False),
+    ('joint', 'F. Le joint ouvert', 'Une simple fente couleur enduit qui coupe l’image en deux, et deux chevrons au centre. La version la plus sobre.', True),
+]
+
+def variantes():
+    p = PROJECTS[0]
+    cards = []
+    for i, (v, t, d, rigid) in enumerate(VARIANTES):
+        cards.append(f'''<section class="var-card" aria-labelledby="v-{v}">
+  <div class="var-text"><h2 id="v-{v}" class="var-title">{t}</h2><p>{d}</p></div>
+  {cordeau_stage(p['before'], p['after'], labels=('Chantier', 'Livré'), cls='cordeau-var', start=0.5, pos=(p['pos_before'], p['pos_after']), sizes='(min-width: 900px) 66vw, 100vw', variant=v, rigid=rigid, range_label=f'{t} : position de la barre')}
+</section>''')
+    body = f'''
+<section class="var-page" aria-labelledby="var-h1">
+  <p class="crumbs mono">Page de travail, non publiée dans le menu</p>
+  <h1 id="var-h1" class="display-xl">Six barres pour le avant/après</h1>
+  <p class="var-lead">Faites glisser chaque barre (souris, doigt ou flèches du clavier) pour comparer. Toutes utilisent les mêmes photos de l’échoppe.</p>
+  {''.join(cards)}
+</section>
+'''
+    return page(path='variantes-barre.html', title='Variantes de la barre avant/après · Atelier Cordeau',
+                description='Page de travail : six designs pour la barre de comparaison chantier / livré.', body=body, body_class='page-var')
+
 def write(name, html):
     with open(os.path.join(ROOT, name), 'w', encoding='utf-8') as f:
         f.write(html)
@@ -647,6 +677,7 @@ if __name__ == '__main__':
     write('contact.html', contact())
     write('mentions-legales.html', legal())
     write('404.html', notfound())
+    write('variantes-barre.html', variantes().replace('<meta name="description"', '<meta name="robots" content="noindex">\n<meta name="description"', 1))
     urls = ['', 'contact.html', 'mentions-legales.html'] + [p['slug'] + '.html' for p in PROJECTS]
     write('sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
           ''.join(f'  <url><loc>{SITE_URL}/{u}</loc></url>\n' for u in urls) + '</urlset>\n')

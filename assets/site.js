@@ -92,8 +92,9 @@
     const paths = svg.querySelectorAll('path');
     const handle = el.querySelector('[data-cordeau-handle]');
     const range = el.querySelector('[data-cordeau-range]');
-    const s = { pos: +el.dataset.start || 0.5, target: +el.dataset.start || 0.5, amp: 0, t: 0, W: 0, H: 0, visible: true, last: '' };
-    const measure = () => { s.W = el.clientWidth; s.H = el.clientHeight; svg.setAttribute('viewBox', `0 0 ${s.W} ${s.H}`); s.last = ''; };
+    const rigid = el.hasAttribute('data-rigid');
+    const s = { pos: +el.dataset.start || 0.5, target: +el.dataset.start || 0.5, amp: 0, t: 0, W: 0, H: 0, hy: 0.5, visible: true, last: '' };
+    const measure = () => { s.W = el.clientWidth; s.H = el.clientHeight; s.hy = parseFloat(getComputedStyle(el).getPropertyValue('--hy')) || 0.5; svg.setAttribute('viewBox', `0 0 ${s.W} ${s.H}`); s.last = ''; };
     new ResizeObserver(measure).observe(el);
     measure();
     new IntersectionObserver(([en]) => { s.visible = en.isIntersecting; }).observe(el);
@@ -111,14 +112,14 @@
       s.t += dt;
       s.amp *= Math.exp(-dt * 3.4);
       const idle = reduce ? 0 : 1.1 * Math.sin(time * 1.25) + 0.5 * Math.sin(time * 2.9);
-      const vib = reduce ? 0 : s.amp * Math.sin(s.t * Math.PI * 2 * 6.5) + idle;
+      const vib = (reduce || rigid) ? 0 : s.amp * Math.sin(s.t * Math.PI * 2 * 6.5) + idle;
       const x = s.pos * s.W, H = s.H, cx = x + vib * 2;
       const d = `M${x.toFixed(1)} -6 Q${cx.toFixed(1)} ${(H / 2).toFixed(1)} ${x.toFixed(1)} ${(H + 6).toFixed(1)}`;
       if (d === s.last) return;
       s.last = d;
       for (const p of paths) p.setAttribute('d', d);
       after.style.clipPath = `path('M${x.toFixed(1)} -6 Q${cx.toFixed(1)} ${(H / 2).toFixed(1)} ${x.toFixed(1)} ${(H + 6).toFixed(1)} L${s.W + 2} ${H + 6} L${s.W + 2} -6 Z')`;
-      if (handle) handle.style.transform = `translate(${(x + vib).toFixed(1)}px, ${(H / 2).toFixed(1)}px)`;
+      if (handle) handle.style.transform = `translate(${(x + vib).toFixed(1)}px, ${(H * s.hy).toFixed(1)}px)`;
     };
 
     if (range) {
@@ -152,7 +153,7 @@
     s.render = (dt) => {
       if (!s.visible || !s.W) return;
       s.t += dt; s.amp *= Math.exp(-dt * 3.6);
-      const vib = reduce ? 0 : s.amp * Math.sin(s.t * Math.PI * 2 * 5.5);
+      const vib = (reduce || rigid) ? 0 : s.amp * Math.sin(s.t * Math.PI * 2 * 5.5);
       const y = s.H / 2;
       const d = `M0 ${y} Q${(s.W / 2).toFixed(1)} ${(y + vib * 2).toFixed(1)} ${s.W} ${y}`;
       if (d !== s.last) { path.setAttribute('d', d); s.last = d; }
