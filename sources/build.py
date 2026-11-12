@@ -350,7 +350,7 @@ def project_page(i):
   </header>
   <div class="case-stage">
     {cordeau_stage(p['before'], p['after'], labels=('Chantier', 'Livré'), cls='cordeau-case', eager=True, start=0.5, pos=(p['pos_before'], p['pos_after']))}
-    <p class="case-hint mono" aria-hidden="true"><span class="hint-pointer">Faites glisser la ligne</span><span class="hint-touch">Glissez la ligne du doigt</span></p>
+    <p class="case-hint mono" aria-hidden="true"><span class="hint-pointer">Passez la souris sur la photo : la ligne suit</span><span class="hint-touch">Glissez le doigt sur la photo</span></p>
   </div>
   <div class="case-body">
     <section class="case-block" aria-labelledby="b1"><h2 id="b1" class="case-h">Le besoin</h2><p>{p['besoin']}</p></section>
@@ -659,7 +659,7 @@ def variantes():
 <section class="var-page" aria-labelledby="var-h1">
   <p class="crumbs mono">Page de travail, non publiée dans le menu</p>
   <h1 id="var-h1" class="display-xl">Six barres pour le avant/après</h1>
-  <p class="var-lead">Faites glisser chaque barre (souris, doigt ou flèches du clavier) pour comparer. Toutes utilisent les mêmes photos de l’échoppe.</p>
+  <p class="var-lead">Passez la souris sur chaque photo (ou glissez le doigt, ou utilisez les flèches du clavier) pour comparer. Toutes utilisent les mêmes photos de l’échoppe.</p>
   {''.join(cards)}
 </section>
 '''

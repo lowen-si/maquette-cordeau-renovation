@@ -128,7 +128,7 @@ main:focus { outline: none; }
 .cordeau.is-dragging .cordeau-handle, .cordeau:hover .cordeau-handle { scale: 1.12; }
 .cordeau:has(.cordeau-range:focus-visible) .cordeau-handle { outline: 3px solid var(--cordeau); outline-offset: 3px; background: #fff; }
 .cordeau-range { position: absolute; left: 0; bottom: 0; width: 100%; height: 1px; opacity: 0; margin: 0; }
-.cordeau[data-interactive] { cursor: ew-resize; }
+.cordeau[data-interactive] { cursor: col-resize; }
 
 /* ---------- hero ---------- */
 .hero { position: relative; }

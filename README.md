@@ -2,7 +2,7 @@
 
 Maquette de démonstration d'un site vitrine pour une entreprise **fictive** de rénovation intérieure à Bordeaux.
 
-L'idée : une ligne de cordeau bleue sépare la pièce en chantier de la pièce livrée. Sur l'accueil, elle avance au défilement ; sur chaque fiche chantier, on la fait glisser.
+L'idée : une ligne de cordeau bleue sépare la pièce en chantier de la pièce livrée. Sur l'accueil, elle avance au défilement ; sur chaque fiche chantier, elle suit la souris (ou le doigt).
 
 ## Voir le site
 Ouvrir `index.html` dans un navigateur, ou servir le dossier :

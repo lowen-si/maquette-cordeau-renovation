@@ -92,27 +92,23 @@
     const paths = svg.querySelectorAll('path');
     const handle = el.querySelector('[data-cordeau-handle]');
     const range = el.querySelector('[data-cordeau-range]');
-    const rigid = el.hasAttribute('data-rigid');
-    const s = { pos: +el.dataset.start || 0.5, target: +el.dataset.start || 0.5, amp: 0, t: 0, W: 0, H: 0, hy: 0.5, visible: true, last: '' };
+        const s = { pos: +el.dataset.start || 0.5, target: +el.dataset.start || 0.5, amp: 0, t: 0, W: 0, H: 0, hy: 0.5, visible: true, last: '' };
     const measure = () => { s.W = el.clientWidth; s.H = el.clientHeight; s.hy = parseFloat(getComputedStyle(el).getPropertyValue('--hy')) || 0.5; svg.setAttribute('viewBox', `0 0 ${s.W} ${s.H}`); s.last = ''; };
     new ResizeObserver(measure).observe(el);
     measure();
     new IntersectionObserver(([en]) => { s.visible = en.isIntersecting; }).observe(el);
 
-    s.pluck = (k = 1) => { s.amp = Math.max(s.amp, k * Math.min(s.W, s.H) * 0.07); s.t = 0; };
-    s.setTarget = (v, excite = true) => {
+    // la ligne reste droite : aucune vibration
+    s.pluck = () => {};
+    s.setTarget = (v) => {
       v = clamp(v, 0.02, 0.98);
-      if (excite && !reduce) s.amp = Math.min(Math.max(s.amp, Math.abs(v - s.target) * s.W * 0.9), Math.min(s.W, s.H) * 0.06);
       s.target = v;
       if (range) range.value = Math.round(v * 100);
     };
     s.render = (dt, time) => {
       if (!s.visible || !s.W) return;
-      s.pos += (s.target - s.pos) * (reduce ? 1 : 1 - Math.exp(-dt * 12));
-      s.t += dt;
-      s.amp *= Math.exp(-dt * 3.4);
-      const idle = reduce ? 0 : 1.1 * Math.sin(time * 1.25) + 0.5 * Math.sin(time * 2.9);
-      const vib = (reduce || rigid) ? 0 : s.amp * Math.sin(s.t * Math.PI * 2 * 6.5) + idle;
+      s.pos += (s.target - s.pos) * (reduce ? 1 : 1 - Math.exp(-dt * 22));
+      const vib = 0;
       const x = s.pos * s.W, H = s.H, cx = x + vib * 2;
       const d = `M${x.toFixed(1)} -6 Q${cx.toFixed(1)} ${(H / 2).toFixed(1)} ${x.toFixed(1)} ${(H + 6).toFixed(1)}`;
       if (d === s.last) return;
@@ -125,14 +121,18 @@
     if (range) {
       el.setAttribute('data-interactive', '');
       range.addEventListener('input', () => s.setTarget(range.value / 100));
+      // souris : la ligne suit simplement le curseur, sans cliquer
+      // doigt : on touche la photo et on glisse
       let drag = false;
       const at = (e) => { const r = el.getBoundingClientRect(); return (e.clientX - r.left) / r.width; };
+      el.addEventListener('pointermove', (e) => {
+        if (e.pointerType === 'mouse' || drag) s.setTarget(at(e));
+      });
       el.addEventListener('pointerdown', (e) => {
-        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        if (e.pointerType === 'mouse') return;
         drag = true; el.classList.add('is-dragging'); el.setPointerCapture(e.pointerId); s.setTarget(at(e));
       });
-      el.addEventListener('pointermove', (e) => { if (drag) s.setTarget(at(e)); });
-      const end = () => { if (drag) { drag = false; el.classList.remove('is-dragging'); s.pluck(0.35); } };
+      const end = () => { if (drag) { drag = false; el.classList.remove('is-dragging'); } };
       el.addEventListener('pointerup', end);
       el.addEventListener('pointercancel', end);
     }
@@ -153,7 +153,7 @@
     s.render = (dt) => {
       if (!s.visible || !s.W) return;
       s.t += dt; s.amp *= Math.exp(-dt * 3.6);
-      const vib = (reduce || rigid) ? 0 : s.amp * Math.sin(s.t * Math.PI * 2 * 5.5);
+      const vib = 0;
       const y = s.H / 2;
       const d = `M0 ${y} Q${(s.W / 2).toFixed(1)} ${(y + vib * 2).toFixed(1)} ${s.W} ${y}`;
       if (d !== s.last) { path.setAttribute('d', d); s.last = d; }
